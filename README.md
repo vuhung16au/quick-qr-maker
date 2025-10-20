@@ -2,6 +2,11 @@
 
 Instant, free QR Code Generator built with Next.js and Tailwind CSS. Generate and download QR codes for URLs and text instantly, without any sign-up or login.
 
+# Live Demo
+
+[Quick QR Maker] (https://quick-qr-maker.vercel.app/)
+
+
 ## Features
 
 - ✨ **Instant Generation**: QR codes are generated in real-time as you type
