@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import QRCode from 'qrcode';
 
 export default function Home() {
@@ -8,16 +8,7 @@ export default function Home() {
   const [qrCodeUrl, setQrCodeUrl] = useState('');
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  // Generate QR code whenever input changes
-  useEffect(() => {
-    if (inputText) {
-      generateQRCode(inputText);
-    } else {
-      setQrCodeUrl('');
-    }
-  }, [inputText]);
-
-  const generateQRCode = async (text: string) => {
+  const generateQRCode = useCallback(async (text: string) => {
     try {
       if (canvasRef.current) {
         await QRCode.toCanvas(canvasRef.current, text, {
@@ -34,7 +25,19 @@ export default function Home() {
     } catch (err) {
       console.error('Error generating QR code:', err);
     }
-  };
+  }, []);
+
+  // Generate QR code with debouncing
+  useEffect(() => {
+    if (inputText) {
+      const timeoutId = setTimeout(() => {
+        generateQRCode(inputText);
+      }, 300);
+      return () => clearTimeout(timeoutId);
+    } else {
+      setQrCodeUrl('');
+    }
+  }, [inputText, generateQRCode]);
 
   const downloadQRCode = () => {
     if (qrCodeUrl) {
