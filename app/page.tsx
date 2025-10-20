@@ -41,6 +41,11 @@ export default function Home() {
     link.click();
   };
 
+  const clearInput = () => {
+    setUrl("");
+    setQrCodeUrl("");
+  };
+
   useEffect(() => {
     if (url) {
       generateQRCode();
@@ -50,7 +55,7 @@ export default function Home() {
   }, [url, generateQRCode]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-light dark:bg-gray-900 transition-colors">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-purple-50 via-white to-pink-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-purple-900 transition-colors">
       {/* Header */}
       <header className="bg-primary dark:bg-gray-800 text-white py-4 px-6 shadow-lg">
         <div className="container mx-auto flex justify-between items-center">
@@ -110,12 +115,12 @@ export default function Home() {
               Create Your QR Code Instantly
             </h2>
             <p className="text-lg text-neutral dark:text-gray-300">
-              Enter a URL below to generate and download your QR code for free
+              Enter a URL or any text below to generate and download your QR code for free
             </p>
           </div>
 
           {/* QR Code Generator */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 md:p-8 mb-8">
+          <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg shadow-xl p-6 md:p-8 mb-8">
             <div className="space-y-6">
               {/* URL Input */}
               <div>
@@ -123,16 +128,26 @@ export default function Home() {
                   htmlFor="url-input"
                   className="block text-sm font-semibold text-dark dark:text-gray-200 mb-2"
                 >
-                  Enter URL
+                  Enter URL or Text
                 </label>
-                <input
-                  id="url-input"
-                  type="text"
-                  value={url}
-                  onChange={(e) => setUrl(e.target.value)}
-                  placeholder="https://example.com"
-                  className="w-full px-4 py-3 border-2 border-neutral/30 dark:border-gray-600 rounded-lg focus:border-primary dark:focus:border-purple-400 focus:outline-none transition-colors text-dark dark:text-gray-100 bg-white dark:bg-gray-700"
-                />
+                <div className="flex gap-2">
+                  <input
+                    id="url-input"
+                    type="text"
+                    value={url}
+                    onChange={(e) => setUrl(e.target.value)}
+                    placeholder="https://example.com or any text"
+                    className="flex-1 px-4 py-3 border-2 border-neutral/30 dark:border-gray-600 rounded-lg focus:border-primary dark:focus:border-purple-400 focus:outline-none transition-colors text-dark dark:text-gray-100 bg-white dark:bg-gray-700"
+                  />
+                  <button
+                    onClick={clearInput}
+                    disabled={!url}
+                    className="px-6 py-3 bg-gray-200 hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-100 font-semibold rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-gray-200 dark:disabled:hover:bg-gray-600"
+                    title="Clear input"
+                  >
+                    Clear
+                  </button>
+                </div>
               </div>
 
               {/* QR Code Display */}
@@ -145,7 +160,8 @@ export default function Home() {
                   {/* Download Button */}
                   <button
                     onClick={downloadQRCode}
-                    className="bg-accent hover:bg-secondary dark:bg-purple-600 dark:hover:bg-purple-700 text-white font-semibold px-8 py-3 rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg"
+                    disabled={!qrCodeUrl}
+                    className="bg-accent hover:bg-secondary dark:bg-purple-600 dark:hover:bg-purple-700 text-white font-semibold px-8 py-3 rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-accent dark:disabled:hover:bg-purple-600"
                   >
                     Download QR Code (PNG)
                   </button>
@@ -156,26 +172,41 @@ export default function Home() {
               {!qrCodeUrl && (
                 <canvas ref={canvasRef} className="hidden" />
               )}
+
+              {/* Privacy Notice */}
+              <div className="mt-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                <div className="flex items-start gap-3">
+                  <div className="text-green-600 dark:text-green-400 text-xl mt-0.5">🔒</div>
+                  <div>
+                    <h4 className="font-semibold text-green-800 dark:text-green-300 mb-1">
+                      Your Privacy is Protected
+                    </h4>
+                    <p className="text-sm text-green-700 dark:text-green-400">
+                      All QR code generation happens locally in your browser. No data is transmitted to any server.
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
           {/* Features Section */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md">
+            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-lg p-6 shadow-md">
               <div className="text-accent dark:text-purple-400 text-3xl mb-3">🚀</div>
-              <h3 className="font-bold text-dark dark:text-gray-100 mb-2">Instant Generation</h3>
+              <h3 className="font-bold text-dark dark:text-gray-100 mb-2">Real-time Generation</h3>
               <p className="text-neutral dark:text-gray-300 text-sm">
-                Generate QR codes instantly as you type. No waiting required.
+                QR codes are automatically generated as you type. No waiting required.
               </p>
             </div>
-            <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md">
+            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-lg p-6 shadow-md">
               <div className="text-accent dark:text-purple-400 text-3xl mb-3">🔒</div>
-              <h3 className="font-bold text-dark dark:text-gray-100 mb-2">No Login Required</h3>
+              <h3 className="font-bold text-dark dark:text-gray-100 mb-2">100% Private</h3>
               <p className="text-neutral dark:text-gray-300 text-sm">
-                Create and download QR codes without any sign-up or login.
+                All processing happens locally in your browser. No data leaves your device.
               </p>
             </div>
-            <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md">
+            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-lg p-6 shadow-md">
               <div className="text-accent dark:text-purple-400 text-3xl mb-3">💾</div>
               <h3 className="font-bold text-dark dark:text-gray-100 mb-2">Free Download</h3>
               <p className="text-neutral dark:text-gray-300 text-sm">
