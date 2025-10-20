@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { ThemeProvider } from "@/components/ThemeProvider";
 
 export const metadata: Metadata = {
   title: "Quick QR Maker - Free QR Code Generator",
@@ -46,9 +47,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* Inline script to prevent theme flash on initial load */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                const theme = localStorage.getItem('theme') || 'dark';
+                document.documentElement.classList.toggle('dark', theme === 'dark');
+              } catch (e) {}
+            `,
+          }}
+        />
+      </head>
       <body className="antialiased">
-        {children}
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   );
