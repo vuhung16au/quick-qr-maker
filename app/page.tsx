@@ -1,0 +1,160 @@
+"use client";
+
+import { useState, useRef, useEffect, useCallback } from "react";
+import QRCode from "qrcode";
+
+export default function Home() {
+  const [url, setUrl] = useState("");
+  const [qrCodeUrl, setQrCodeUrl] = useState("");
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  const generateQRCode = useCallback(async () => {
+    if (!url) return;
+
+    try {
+      const canvas = canvasRef.current;
+      if (canvas) {
+        await QRCode.toCanvas(canvas, url, {
+          width: 300,
+          margin: 2,
+          color: {
+            dark: "#000000",
+            light: "#FFFFFF",
+          },
+        });
+        const dataUrl = canvas.toDataURL("image/png");
+        setQrCodeUrl(dataUrl);
+      }
+    } catch (err) {
+      console.error("Error generating QR code:", err);
+    }
+  }, [url]);
+
+  const downloadQRCode = () => {
+    if (!qrCodeUrl) return;
+
+    const link = document.createElement("a");
+    link.download = "qrcode.png";
+    link.href = qrCodeUrl;
+    link.click();
+  };
+
+  useEffect(() => {
+    if (url) {
+      generateQRCode();
+    } else {
+      setQrCodeUrl("");
+    }
+  }, [url, generateQRCode]);
+
+  return (
+    <div className="min-h-screen flex flex-col">
+      {/* Header */}
+      <header className="bg-primary text-white py-4 px-6 shadow-lg">
+        <div className="container mx-auto">
+          <h1 className="text-2xl md:text-3xl font-bold">Quick QR Maker</h1>
+          <p className="text-sm md:text-base mt-1 opacity-90">
+            Free QR Code Generator - No Login Required
+          </p>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="flex-grow container mx-auto px-4 py-8 md:py-12">
+        <div className="max-w-4xl mx-auto">
+          {/* Hero Section */}
+          <div className="text-center mb-8 md:mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">
+              Create Your QR Code Instantly
+            </h2>
+            <p className="text-lg text-neutral">
+              Enter a URL below to generate and download your QR code for free
+            </p>
+          </div>
+
+          {/* QR Code Generator */}
+          <div className="bg-white rounded-lg shadow-xl p-6 md:p-8 mb-8">
+            <div className="space-y-6">
+              {/* URL Input */}
+              <div>
+                <label
+                  htmlFor="url-input"
+                  className="block text-sm font-semibold text-dark mb-2"
+                >
+                  Enter URL
+                </label>
+                <input
+                  id="url-input"
+                  type="text"
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
+                  placeholder="https://example.com"
+                  className="w-full px-4 py-3 border-2 border-neutral/30 rounded-lg focus:border-primary focus:outline-none transition-colors text-dark"
+                />
+              </div>
+
+              {/* QR Code Display */}
+              {qrCodeUrl && (
+                <div className="flex flex-col items-center space-y-4 py-6">
+                  <div className="bg-white p-4 rounded-lg border-2 border-neutral/20">
+                    <canvas ref={canvasRef} className="max-w-full h-auto" />
+                  </div>
+
+                  {/* Download Button */}
+                  <button
+                    onClick={downloadQRCode}
+                    className="bg-accent hover:bg-secondary text-white font-semibold px-8 py-3 rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg"
+                  >
+                    Download QR Code (PNG)
+                  </button>
+                </div>
+              )}
+
+              {/* Hidden Canvas for Generation */}
+              {!qrCodeUrl && (
+                <canvas ref={canvasRef} className="hidden" />
+              )}
+            </div>
+          </div>
+
+          {/* Features Section */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-white rounded-lg p-6 shadow-md">
+              <div className="text-accent text-3xl mb-3">🚀</div>
+              <h3 className="font-bold text-dark mb-2">Instant Generation</h3>
+              <p className="text-neutral text-sm">
+                Generate QR codes instantly as you type. No waiting required.
+              </p>
+            </div>
+            <div className="bg-white rounded-lg p-6 shadow-md">
+              <div className="text-accent text-3xl mb-3">🔒</div>
+              <h3 className="font-bold text-dark mb-2">No Login Required</h3>
+              <p className="text-neutral text-sm">
+                Create and download QR codes without any sign-up or login.
+              </p>
+            </div>
+            <div className="bg-white rounded-lg p-6 shadow-md">
+              <div className="text-accent text-3xl mb-3">💾</div>
+              <h3 className="font-bold text-dark mb-2">Free Download</h3>
+              <p className="text-neutral text-sm">
+                Download your QR codes in PNG format for free, forever.
+              </p>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      {/* Footer */}
+      <footer className="bg-dark text-white py-6 px-6 mt-auto">
+        <div className="container mx-auto text-center">
+          <p className="text-sm opacity-80">
+            © {new Date().getFullYear()} Quick QR Maker. All rights reserved.
+          </p>
+          <p className="text-xs mt-2 opacity-60">
+            Free QR Code Generator - No Login Required
+          </p>
+        </div>
+      </footer>
+    </div>
+  );
+}
